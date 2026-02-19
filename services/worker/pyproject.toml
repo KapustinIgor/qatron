@@ -3,7 +3,7 @@ name = "qatron-worker"
 version = "0.1.0"
 description = "QAtron Worker Service"
 authors = ["QAtron Team"]
-package-mode = false
+packages = [{ include = "app" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
