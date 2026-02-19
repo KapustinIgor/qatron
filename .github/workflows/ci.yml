@@ -16,6 +16,8 @@ jobs:
           python-version: '3.11'
       - name: Install Poetry
         run: pip install "poetry>=1.8,<2"
+      - name: Clear Poetry cache
+        run: poetry cache clear PyPI --all
       # pyproject.toml has package-mode = false; --no-root skips installing the project (deps only)
       - name: Install dependencies (control-plane, orchestrator, worker)
         run: |
@@ -48,6 +50,8 @@ jobs:
           python-version: '3.11'
       - name: Install Poetry
         run: pip install "poetry>=1.8,<2"
+      - name: Clear Poetry cache
+        run: poetry cache clear PyPI --all
       # package-mode = false in pyproject.toml; --no-root installs deps only
       - name: Install dependencies (control-plane, orchestrator)
         run: |
