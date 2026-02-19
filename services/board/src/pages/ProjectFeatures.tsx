@@ -28,7 +28,11 @@ export default function ProjectFeatures() {
     enabled: id > 0,
   })
 
-  const ingestMutation = useMutation({
+  const ingestMutation = useMutation<
+    { message: string; features_count: number },
+    unknown,
+    { file_path: string; content: string }[]
+  >({
     mutationFn: (items: { file_path: string; content: string }[]) =>
       featuresApi.ingestFromContent(id, items),
     onSuccess: () => {

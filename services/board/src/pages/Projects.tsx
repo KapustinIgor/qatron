@@ -31,7 +31,7 @@ export default function Projects() {
     queryFn: () => authApi.getCurrentUser(),
   })
 
-  const createMutation = useMutation({
+  const createMutation = useMutation<Project, unknown, typeof formData>({
     mutationFn: (data: typeof formData) => projectsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
@@ -51,7 +51,11 @@ export default function Projects() {
     },
   })
 
-  const updateMutation = useMutation({
+  const updateMutation = useMutation<
+    Project,
+    unknown,
+    { id: number; data: Partial<typeof formData> }
+  >({
     mutationFn: ({ id, data }: { id: number; data: Partial<typeof formData> }) =>
       projectsApi.update(id, data),
     onSuccess: () => {

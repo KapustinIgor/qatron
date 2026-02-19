@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { runsApi } from '../api/runs'
+import { getErrorMessage } from '../types'
 import './RunDetail.css'
 
 export default function RunDetail() {
@@ -13,7 +14,11 @@ export default function RunDetail() {
     queryFn: () => runsApi.get(runIdNum),
   })
 
-  const triggerMutation = useMutation({
+  const triggerMutation = useMutation<
+    { message: string; run_id: number },
+    unknown,
+    void
+  >({
     mutationFn: () => runsApi.trigger(runIdNum),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['runs', runIdNum] })
@@ -22,11 +27,7 @@ export default function RunDetail() {
   })
 
   const triggerErrorMessage = triggerMutation.error
-    ? (() => {
-        const e = triggerMutation.error as { response?: { data?: { detail?: string | string[] } }; message?: string }
-        const d = e?.response?.data?.detail ?? e?.message
-        return Array.isArray(d) ? d.join(', ') : typeof d === 'string' ? d : String(d ?? 'Unknown error')
-      })()
+    ? getErrorMessage(triggerMutation.error, 'Trigger failed')
     : ''
   const isTriggerSuccess = triggerMutation.isSuccess && !triggerMutation.isPending
 

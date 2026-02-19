@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { authApi } from '../api/auth'
+import { authApi, TokenResponse } from '../api/auth'
 import { getErrorMessage } from '../types'
 import './Login.css'
 
@@ -19,7 +19,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await authApi.login({ username, password })
+      const response: TokenResponse = await authApi.login({ username, password })
       setToken(response.access_token)
       navigate('/')
     } catch (err: unknown) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useSearchParams } from 'react-router-dom'
 import { runsApi, RunFilters } from '../api/runs'
+import { getErrorMessage } from '../types'
 import './Runs.css'
 
 export default function Runs() {
@@ -29,7 +30,11 @@ export default function Runs() {
     queryFn: () => runsApi.list(filters),
   })
 
-  const triggerMutation = useMutation({
+  const triggerMutation = useMutation<
+    { message: string; run_id: number },
+    unknown,
+    number
+  >({
     mutationFn: (runId: number) => runsApi.trigger(runId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['runs'] })
@@ -37,11 +42,7 @@ export default function Runs() {
   })
 
   const triggerErrorDetail = triggerMutation.error
-    ? (() => {
-        const e = triggerMutation.error as { response?: { data?: { detail?: string | string[] } }; message?: string }
-        const d = e?.response?.data?.detail ?? e?.message
-        return Array.isArray(d) ? d.join(', ') : typeof d === 'string' ? d : String(d ?? 'Unknown error')
-      })()
+    ? getErrorMessage(triggerMutation.error, 'Trigger failed')
     : ''
 
   if (isLoading) {

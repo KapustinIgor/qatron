@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { projectsApi } from '../api/projects'
-import { runsApi } from '../api/runs'
+import { Run, runsApi } from '../api/runs'
 import { getErrorMessage } from '../types'
 import './NewRun.css'
 
@@ -32,7 +32,11 @@ export default function NewRun() {
     enabled: typeof projectId === 'number' && projectId > 0,
   })
 
-  const createMutation = useMutation({
+  const createMutation = useMutation<
+    Run,
+    unknown,
+    { project_id: number; suite_id: number; environment_id: number; branch?: string }
+  >({
     mutationFn: (data: { project_id: number; suite_id: number; environment_id: number; branch?: string }) =>
       runsApi.create(data),
     onSuccess: (run) => {
@@ -69,7 +73,11 @@ export default function NewRun() {
   const noSuites = projectId && suites?.length === 0
   const noEnvironments = projectId && environments?.length === 0
 
-  const ensureDefaultsMutation = useMutation({
+  const ensureDefaultsMutation = useMutation<
+    { message: string; created: string[] },
+    unknown,
+    void
+  >({
     mutationFn: () => projectsApi.ensureDefaults(projectId as number),
     onSuccess: () => {
       queryClient.invalidateQueries({
