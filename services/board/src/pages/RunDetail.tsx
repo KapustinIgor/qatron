@@ -21,8 +21,13 @@ export default function RunDetail() {
     },
   })
 
-  const triggerError = triggerMutation.error as any
-  const triggerErrorMessage = triggerError?.response?.data?.detail ?? triggerError?.message
+  const triggerErrorMessage = triggerMutation.error
+    ? (() => {
+        const e = triggerMutation.error as { response?: { data?: { detail?: string | string[] } }; message?: string }
+        const d = e?.response?.data?.detail ?? e?.message
+        return Array.isArray(d) ? d.join(', ') : typeof d === 'string' ? d : String(d ?? 'Unknown error')
+      })()
+    : ''
   const isTriggerSuccess = triggerMutation.isSuccess && !triggerMutation.isPending
 
   if (isLoading) {
@@ -47,11 +52,9 @@ export default function RunDetail() {
             >
               {triggerMutation.isPending ? 'Triggering...' : 'Trigger run'}
             </button>
-            {triggerErrorMessage && (
-              <p className="trigger-error">
-                {Array.isArray(triggerErrorMessage) ? triggerErrorMessage.join(', ') : triggerErrorMessage}
-              </p>
-            )}
+            {triggerErrorMessage ? (
+              <p className="trigger-error">{triggerErrorMessage}</p>
+            ) : null}
             {isTriggerSuccess && (
               <p className="trigger-success">Run triggered. Status may update shortly.</p>
             )}

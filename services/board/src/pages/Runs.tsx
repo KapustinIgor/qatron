@@ -36,9 +36,13 @@ export default function Runs() {
     },
   })
 
-  const triggerError = triggerMutation.error as any
-  const triggerErrorMessage = triggerError?.response?.data?.detail ?? triggerError?.message
-  const triggerErrorDetail = Array.isArray(triggerErrorMessage) ? triggerErrorMessage.join(', ') : triggerErrorMessage
+  const triggerErrorDetail = triggerMutation.error
+    ? (() => {
+        const e = triggerMutation.error as { response?: { data?: { detail?: string | string[] } }; message?: string }
+        const d = e?.response?.data?.detail ?? e?.message
+        return Array.isArray(d) ? d.join(', ') : typeof d === 'string' ? d : String(d ?? 'Unknown error')
+      })()
+    : ''
 
   if (isLoading) {
     return <div className="loading">Loading runs...</div>

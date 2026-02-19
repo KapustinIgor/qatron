@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { authApi } from '../api/auth'
+import { getErrorMessage } from '../types'
 import './Login.css'
 
 export default function Login() {
@@ -21,8 +22,8 @@ export default function Login() {
       const response = await authApi.login({ username, password })
       setToken(response.access_token)
       navigate('/')
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed')
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Login failed'))
     } finally {
       setLoading(false)
     }

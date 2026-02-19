@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { projectsApi } from '../api/projects'
 import { runsApi } from '../api/runs'
+import { getErrorMessage } from '../types'
 import './NewRun.css'
 
 export default function NewRun() {
@@ -38,8 +39,8 @@ export default function NewRun() {
       queryClient.invalidateQueries({ queryKey: ['runs'] })
       navigate(`/runs/${run.id}`)
     },
-    onError: (err: any) => {
-      setError(err.response?.data?.detail || 'Failed to create run')
+    onError: (err: unknown) => {
+      setError(getErrorMessage(err, 'Failed to create run'))
     },
   })
 
@@ -67,7 +68,6 @@ export default function NewRun() {
 
   const noSuites = projectId && suites?.length === 0
   const noEnvironments = projectId && environments?.length === 0
-  const canEnsureDefaults = noSuites || noEnvironments
 
   const ensureDefaultsMutation = useMutation({
     mutationFn: () => projectsApi.ensureDefaults(projectId as number),
@@ -79,8 +79,8 @@ export default function NewRun() {
         queryKey: ['projects', projectId, 'environments'],
       })
     },
-    onError: (err: any) => {
-      setError(err.response?.data?.detail || 'Failed to create defaults')
+    onError: (err: unknown) => {
+      setError(getErrorMessage(err, 'Failed to create defaults'))
     },
   })
 

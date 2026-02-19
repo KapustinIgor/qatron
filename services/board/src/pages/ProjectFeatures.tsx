@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { featuresApi, ProjectFeature } from '../api/features'
 import { projectsApi } from '../api/projects'
+import { getErrorMessage } from '../types'
 import './ProjectFeatures.css'
 
 export default function ProjectFeatures() {
@@ -35,8 +36,8 @@ export default function ProjectFeatures() {
       setPasteContent('')
       setIngestError('')
     },
-    onError: (err: any) => {
-      setIngestError(err.response?.data?.detail || 'Ingest failed')
+    onError: (err: unknown) => {
+      setIngestError(getErrorMessage(err, 'Ingest failed'))
     },
   })
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { projectsApi, Project } from '../api/projects'
 import { authApi } from '../api/auth'
+import { getErrorMessage } from '../types'
 import './Projects.css'
 
 export default function Projects() {
@@ -45,8 +46,8 @@ export default function Projects() {
       })
       setError('')
     },
-    onError: (err: any) => {
-      setError(err.response?.data?.detail || 'Failed to create project')
+    onError: (err: unknown) => {
+      setError(getErrorMessage(err, 'Failed to create project'))
     },
   })
 
@@ -66,8 +67,8 @@ export default function Projects() {
       })
       setError('')
     },
-    onError: (err: any) => {
-      setError(err.response?.data?.detail || 'Failed to update project')
+    onError: (err: unknown) => {
+      setError(getErrorMessage(err, 'Failed to update project'))
     },
   })
 
