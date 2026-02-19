@@ -42,7 +42,7 @@ def execute(body: dict):
     context = body.get("context") or {}
     run_id = job.get("run_id")
     shard_index = job.get("shard_index", 0)
-    shard_total = job.get("shard_total", 1)
+    _shard_total = job.get("shard_total", 1)  # reserved for future sharding
     if not run_id:
         raise HTTPException(status_code=400, detail="job.run_id required")
 

@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 import boto3
 import httpx
