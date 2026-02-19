@@ -27,7 +27,7 @@ jobs:
           poetry --directory=services/control-plane install --no-root --with dev
           poetry --directory=services/orchestrator install --no-root --with dev
           poetry --directory=services/worker install --no-root --with dev
-      - name: Lint control-plane
+      - name: Lint control-plane (cd + python -m ruff)
         run: cd services/control-plane && poetry run python -m ruff check .
       - name: Lint orchestrator
         run: cd services/orchestrator && poetry run python -m ruff check .
