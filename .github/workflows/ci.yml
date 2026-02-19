@@ -26,9 +26,9 @@ jobs:
           poetry --directory=services/worker install --no-root --with dev
       - name: Run linters
         run: |
-          poetry --directory=services/control-plane run ruff check .
-          poetry --directory=services/orchestrator run ruff check .
-          poetry --directory=services/worker run ruff check .
+          poetry --directory=services/control-plane run python -m ruff check .
+          poetry --directory=services/orchestrator run python -m ruff check .
+          poetry --directory=services/worker run python -m ruff check .
 
   test:
     runs-on: ubuntu-latest
@@ -61,8 +61,8 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/qatron_test
         run: |
-          poetry --directory=services/control-plane run pytest
-          poetry --directory=services/orchestrator run pytest
+          poetry --directory=services/control-plane run python -m pytest
+          poetry --directory=services/orchestrator run python -m pytest
 
   frontend:
     runs-on: ubuntu-latest
