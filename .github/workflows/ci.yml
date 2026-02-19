@@ -18,14 +18,14 @@ jobs:
         run: pip install "poetry>=1.8,<2"
       - name: Install dependencies (control-plane, orchestrator, worker)
         run: |
-          cd services/control-plane && poetry install --no-root
-          cd ../orchestrator && poetry install --no-root
-          cd ../worker && poetry install --no-root
+          poetry --directory=services/control-plane install --no-root
+          poetry --directory=services/orchestrator install --no-root
+          poetry --directory=services/worker install --no-root
       - name: Run linters
         run: |
-          cd services/control-plane && poetry run ruff check .
-          cd ../orchestrator && poetry run ruff check .
-          cd ../worker && poetry run ruff check .
+          poetry --directory=services/control-plane run ruff check .
+          poetry --directory=services/orchestrator run ruff check .
+          poetry --directory=services/worker run ruff check .
 
   test:
     runs-on: ubuntu-latest
@@ -49,14 +49,14 @@ jobs:
         run: pip install "poetry>=1.8,<2"
       - name: Install dependencies (control-plane, orchestrator)
         run: |
-          cd services/control-plane && poetry install --no-root
-          cd ../orchestrator && poetry install --no-root
+          poetry --directory=services/control-plane install --no-root
+          poetry --directory=services/orchestrator install --no-root
       - name: Run tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/qatron_test
         run: |
-          cd services/control-plane && poetry run pytest
-          cd ../orchestrator && poetry run pytest
+          poetry --directory=services/control-plane run pytest
+          poetry --directory=services/orchestrator run pytest
 
   frontend:
     runs-on: ubuntu-latest
