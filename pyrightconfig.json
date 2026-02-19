@@ -1,0 +1,8 @@
+{
+  "include": ["framework", "services", "cli", "deployment"],
+  "extraPaths": [
+    "framework/qatron-python/example/venv/lib/python3.13/site-packages"
+  ],
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "warning"
+}

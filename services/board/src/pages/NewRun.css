@@ -1,0 +1,144 @@
+.new-run-page {
+  max-width: 520px;
+}
+
+.new-run-page .page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.new-run-page .btn-back {
+  padding: 8px 12px;
+  background: #ecf0f1;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.new-run-page .btn-back:hover {
+  background: #bdc3c7;
+}
+
+.new-run-page h1 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.new-run-card {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.new-run-intro {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.new-run-card .form-group {
+  margin-bottom: 16px;
+}
+
+.new-run-card label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.new-run-card select,
+.new-run-card input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.new-run-card select:disabled {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.form-hint.warning {
+  background: #fff3cd;
+  color: #856404;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.btn-ensure-defaults {
+  display: block;
+  margin-top: 8px;
+  padding: 8px 14px;
+  background: #856404;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-ensure-defaults:hover:not(:disabled) {
+  background: #664d03;
+}
+
+.btn-ensure-defaults:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.new-run-card .btn-primary {
+  padding: 10px 20px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.new-run-card .btn-primary:hover:not(:disabled) {
+  background: #2980b9;
+}
+
+.new-run-card .btn-primary:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: #95a5a6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.btn-secondary:hover {
+  background: #7f8c8d;
+}
+
+.error-message {
+  color: #c0392b;
+  margin-bottom: 16px;
+  font-size: 14px;
+}

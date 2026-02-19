@@ -1,0 +1,161 @@
+# QAtron Helm Chart Values
+
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# Control Plane
+controlPlane:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: qatron/control-plane
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+# Orchestrator
+orchestrator:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: qatron/orchestrator
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8001
+  celery:
+    workers: 4
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+# Board (UI)
+board:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: qatron/board
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: false
+    host: qatron.example.com
+    tls:
+      enabled: false
+      secretName: qatron-tls
+
+# Reporting
+reporting:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: qatron/reporting
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8002
+
+# Data Manager
+dataManager:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: qatron/data-manager
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8003
+
+# PostgreSQL
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "qatron"
+    database: "qatron"
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: ""
+
+# RabbitMQ
+rabbitmq:
+  enabled: true
+  auth:
+    username: "guest"
+    password: "guest"
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Redis
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 10Gi
+
+# MinIO
+minio:
+  enabled: true
+  auth:
+    rootUser: "minioadmin"
+    rootPassword: "minioadmin"
+  persistence:
+    enabled: true
+    size: 100Gi
+    storageClass: ""
+
+# Selenium Grid
+seleniumGrid:
+  enabled: true
+  hub:
+    replicas: 1
+  node:
+    replicas: 3
+    maxInstances: 4
+
+# Observability
+observability:
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+    adminPassword: "admin"
+  loki:
+    enabled: true
+
+# Ingress
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: qatron.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

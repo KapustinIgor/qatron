@@ -1,0 +1,43 @@
+{
+  "dashboard": {
+    "title": "QAtron Overview",
+    "panels": [
+      {
+        "title": "Run Volume",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(qatron_runs_total[5m])"
+          }
+        ]
+      },
+      {
+        "title": "Queue Depth",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "qatron_queue_depth"
+          }
+        ]
+      },
+      {
+        "title": "Worker Utilization",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "qatron_workers_busy / qatron_workers_total"
+          }
+        ]
+      },
+      {
+        "title": "Failure Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(qatron_runs_failed_total[5m]) / rate(qatron_runs_total[5m])"
+          }
+        ]
+      }
+    ]
+  }
+}

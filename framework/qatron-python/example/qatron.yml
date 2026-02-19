@@ -1,0 +1,60 @@
+# QAtron configuration file
+# test_dir: "." so worker runs pytest from repo root (test_*.py and pytest.ini live here)
+test_dir: "."
+
+environments:
+  local:
+    base_url: http://localhost:3000
+    api_url: http://localhost:8000/api/v1
+    dataset: local-dataset
+  
+  amazon:
+    base_url: https://www.amazon.com
+  
+  staging:
+    base_url: https://staging.example.com
+    api_url: https://api-staging.example.com/v1
+    dataset: staging-dataset
+
+  production:
+    base_url: https://example.com
+    api_url: https://api.example.com/v1
+    dataset: production-dataset
+
+suites:
+  smoke:
+    layer: e2e
+    tags: [smoke, critical]
+    shards: 1
+    retries: 0
+    timeout: 600
+
+  regression:
+    layer: e2e
+    tags: [regression]
+    shards: 4
+    retries: 1
+    timeout: 3600
+
+  integration:
+    layer: integration
+    tags: [integration]
+    shards: 2
+    retries: 0
+    timeout: 1800
+
+coverage:
+  thresholds:
+    unit: 80.0
+    contract: 70.0
+    integration: 60.0
+    e2e: 50.0
+
+notifications:
+  webhooks:
+    - url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+      on: [failure, completion]
+
+execution:
+  timeout: 3600
+  concurrency: 10

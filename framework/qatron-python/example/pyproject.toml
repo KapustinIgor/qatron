@@ -1,0 +1,19 @@
+[project]
+name = "qatron-example"
+version = "0.1.0"
+description = "QAtron BDD/E2E example project"
+requires-python = ">=3.11"
+dependencies = [
+    "pytest>=7.4.0",
+    "pytest-bdd>=7.0.0",
+    "pytest-html>=4.1.0",
+    "pytest-xdist>=3.5.0",
+    "allure-pytest>=2.13.2",
+    "selenium>=4.15.0",
+    "pyyaml>=6.0.1",
+    "requests>=2.31.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["steps*", "features*"]

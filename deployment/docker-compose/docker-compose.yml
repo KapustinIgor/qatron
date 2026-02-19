@@ -1,0 +1,322 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: qatron-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-qatron}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qatron}
+      POSTGRES_DB: ${POSTGRES_DB:-qatron}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qatron}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - qatron-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: qatron-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - qatron-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: qatron-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - qatron-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: qatron-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data/minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - qatron-network
+
+  control-plane:
+    build:
+      context: ../../services/control-plane
+      dockerfile: Dockerfile
+    container_name: qatron-control-plane
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-qatron}:${POSTGRES_PASSWORD:-qatron}@postgres:5432/${POSTGRES_DB:-qatron}
+      REDIS_URL: redis://redis:6379/0
+      ORCHESTRATOR_URL: http://orchestrator:8001
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET_NAME: ${MINIO_BUCKET_NAME:-qatron-artifacts}
+      SECRET_KEY: ${CONTROL_PLANE_SECRET_KEY:-change-me-in-production}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs/control-plane:/app/logs
+    networks:
+      - qatron-network
+
+  orchestrator:
+    build:
+      context: ../../services/orchestrator
+      dockerfile: Dockerfile
+    container_name: qatron-orchestrator
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-qatron}:${POSTGRES_PASSWORD:-qatron}@postgres:5432/${POSTGRES_DB:-qatron}
+      CELERY_BROKER_URL: amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672//
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CONTROL_PLANE_API_URL: http://control-plane:8000/api/v1
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      control-plane:
+        condition: service_started
+    volumes:
+      - ./logs/orchestrator:/app/logs
+    networks:
+      - qatron-network
+
+  orchestrator-worker:
+    build:
+      context: ../../services/orchestrator
+      dockerfile: Dockerfile
+    container_name: qatron-orchestrator-worker
+    command: celery -A app.core.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-qatron}:${POSTGRES_PASSWORD:-qatron}@postgres:5432/${POSTGRES_DB:-qatron}
+      CELERY_BROKER_URL: amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672//
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CONTROL_PLANE_API_URL: http://control-plane:8000/api/v1
+      WORKER_URL: http://worker:8004
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      orchestrator:
+        condition: service_started
+    volumes:
+      - ./logs/orchestrator:/app/logs
+    networks:
+      - qatron-network
+
+  reporting:
+    build:
+      context: ../../services/reporting
+      dockerfile: Dockerfile
+    container_name: qatron-reporting
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-qatron}:${POSTGRES_PASSWORD:-qatron}@postgres:5432/${POSTGRES_DB:-qatron}
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET_NAME: ${MINIO_BUCKET_NAME:-qatron-artifacts}
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./logs/reporting:/app/logs
+    networks:
+      - qatron-network
+
+  data-manager:
+    build:
+      context: ../../services/data-manager
+      dockerfile: Dockerfile
+    container_name: qatron-data-manager
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-qatron}:${POSTGRES_PASSWORD:-qatron}@postgres:5432/${POSTGRES_DB:-qatron}
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET_NAME: ${MINIO_BUCKET_NAME:-qatron-artifacts}
+    ports:
+      - "8003:8003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./logs/data-manager:/app/logs
+    networks:
+      - qatron-network
+
+  board:
+    build:
+      context: ../../services/board
+      dockerfile: Dockerfile
+    container_name: qatron-board
+    ports:
+      - "3000:80"
+    depends_on:
+      - control-plane
+    networks:
+      - qatron-network
+
+  worker:
+    build:
+      context: ../../services/worker
+      dockerfile: Dockerfile
+    container_name: qatron-worker
+    environment:
+      CONTROL_PLANE_API_URL: http://control-plane:8000/api/v1
+      SELENIUM_GRID_URL: http://selenium-hub:4444/wd/hub
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET_NAME: ${MINIO_BUCKET_NAME:-qatron-artifacts}
+      S3_REGION: us-east-1
+    depends_on:
+      control-plane:
+        condition: service_started
+      minio:
+        condition: service_healthy
+      selenium-hub:
+        condition: service_healthy
+    networks:
+      - qatron-network
+
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: qatron-selenium-hub
+    ports:
+      - "4444:4444"
+    environment:
+      GRID_MAX_SESSION: 16
+      GRID_BROWSER_TIMEOUT: 300
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4444/status >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - qatron-network
+
+  selenium-node:
+    image: selenium/node-chrome:4.15.0
+    container_name: qatron-selenium-node
+    shm_size: 2gb
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      HUB_HOST: selenium-hub
+      HUB_PORT: 4444
+      NODE_MAX_INSTANCES: 4
+      NODE_MAX_SESSION: 4
+    networks:
+      - qatron-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: qatron-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - qatron-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: qatron-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - qatron-network
+
+  loki:
+    image: grafana/loki:latest
+    container_name: qatron-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./observability/loki-config.yml:/etc/loki/local-config.yaml
+      - ./data/loki:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - qatron-network
+
+networks:
+  qatron-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  minio-data:
+  rabbitmq-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+  loki-data:

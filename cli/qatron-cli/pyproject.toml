@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "qatron-cli"
+version = "0.1.0"
+description = "QAtron CLI tool"
+authors = ["QAtron Team"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+qatron = "qatron_cli.main:cli"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.7"
+requests = "^2.31.0"
+pyyaml = "^6.0.1"
+rich = "^13.7.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+black = "^23.0.0"
+ruff = "^0.1.0"
+mypy = "^1.5.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.11"
