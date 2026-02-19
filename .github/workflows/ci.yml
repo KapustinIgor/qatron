@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install Poetry
-        run: pip install poetry
+        run: pip install "poetry>=1.8,<2"
       - name: Install control-plane dependencies
         run: cd services/control-plane && poetry install --no-root
       - name: Install orchestrator dependencies
@@ -47,7 +47,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install Poetry
-        run: pip install poetry
+        run: pip install "poetry>=1.8,<2"
       - name: Install control-plane dependencies
         run: cd services/control-plane && poetry install --no-root
       - name: Install orchestrator dependencies
