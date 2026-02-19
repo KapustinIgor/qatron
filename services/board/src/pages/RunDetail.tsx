@@ -26,7 +26,8 @@ export default function RunDetail() {
     },
   })
 
-  const triggerErr: unknown = triggerMutation.error
+  // mutation.error is typed any by @tanstack/react-query when TError is generic
+  const triggerErr = triggerMutation.error as unknown
   const triggerErrorMessage = triggerErr
     ? getErrorMessage(triggerErr, 'Trigger failed')
     : ''

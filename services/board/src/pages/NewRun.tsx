@@ -43,9 +43,8 @@ export default function NewRun() {
       queryClient.invalidateQueries({ queryKey: ['runs'] })
       navigate(`/runs/${run.id}`)
     },
-    onError: (err) => {
-      const e: unknown = err
-      setError(getErrorMessage(e, 'Failed to create run'))
+    onError: (err: unknown) => {
+      setError(getErrorMessage(err, 'Failed to create run'))
     },
   })
 
@@ -89,9 +88,8 @@ export default function NewRun() {
         queryKey: ['projects', projectId, 'environments'],
       })
     },
-    onError: (err) => {
-      const e: unknown = err
-      setError(getErrorMessage(e, 'Failed to create defaults'))
+    onError: (err: unknown) => {
+      setError(getErrorMessage(err, 'Failed to create defaults'))
     },
   })
 

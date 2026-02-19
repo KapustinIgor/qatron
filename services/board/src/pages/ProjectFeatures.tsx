@@ -40,9 +40,8 @@ export default function ProjectFeatures() {
       setPasteContent('')
       setIngestError('')
     },
-    onError: (err) => {
-      const e: unknown = err
-      setIngestError(getErrorMessage(e, 'Ingest failed'))
+    onError: (err: unknown) => {
+      setIngestError(getErrorMessage(err, 'Ingest failed'))
     },
   })
 

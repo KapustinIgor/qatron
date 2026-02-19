@@ -22,9 +22,8 @@ export default function Login() {
       const response: TokenResponse = await authApi.login({ username, password })
       setToken(response.access_token)
       navigate('/')
-    } catch (err) {
-      const e: unknown = err
-      setError(getErrorMessage(e, 'Login failed'))
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Login failed'))
     } finally {
       setLoading(false)
     }
