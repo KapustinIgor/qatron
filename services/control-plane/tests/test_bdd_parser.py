@@ -1,8 +1,5 @@
 """Unit tests for app.services.bdd_parser (Gherkin parsing)."""
 
-import pytest
-from pathlib import Path
-
 from app.services.bdd_parser import GherkinParser
 
 

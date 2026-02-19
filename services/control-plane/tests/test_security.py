@@ -1,7 +1,5 @@
 """Unit tests for app.core.security."""
 
-import pytest
-
 from app.core.security import (
     decode_access_token,
     create_access_token,
