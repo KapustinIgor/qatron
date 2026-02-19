@@ -26,8 +26,9 @@ export default function RunDetail() {
     },
   })
 
-  const triggerErrorMessage = triggerMutation.error
-    ? getErrorMessage(triggerMutation.error, 'Trigger failed')
+  const triggerErr: unknown = triggerMutation.error
+  const triggerErrorMessage = triggerErr
+    ? getErrorMessage(triggerErr, 'Trigger failed')
     : ''
   const isTriggerSuccess = triggerMutation.isSuccess && !triggerMutation.isPending
 

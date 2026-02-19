@@ -46,8 +46,9 @@ export default function Projects() {
       })
       setError('')
     },
-    onError: (err: unknown) => {
-      setError(getErrorMessage(err, 'Failed to create project'))
+    onError: (err) => {
+      const e: unknown = err
+      setError(getErrorMessage(e, 'Failed to create project'))
     },
   })
 
@@ -71,8 +72,9 @@ export default function Projects() {
       })
       setError('')
     },
-    onError: (err: unknown) => {
-      setError(getErrorMessage(err, 'Failed to update project'))
+    onError: (err) => {
+      const e: unknown = err
+      setError(getErrorMessage(e, 'Failed to update project'))
     },
   })
 

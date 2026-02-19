@@ -41,8 +41,9 @@ export default function Runs() {
     },
   })
 
-  const triggerErrorDetail = triggerMutation.error
-    ? getErrorMessage(triggerMutation.error, 'Trigger failed')
+  const triggerErr: unknown = triggerMutation.error
+  const triggerErrorDetail = triggerErr
+    ? getErrorMessage(triggerErr, 'Trigger failed')
     : ''
 
   if (isLoading) {

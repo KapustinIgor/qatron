@@ -39,12 +39,13 @@ export default function NewRun() {
   >({
     mutationFn: (data: { project_id: number; suite_id: number; environment_id: number; branch?: string }) =>
       runsApi.create(data),
-    onSuccess: (run) => {
+    onSuccess: (run: Run) => {
       queryClient.invalidateQueries({ queryKey: ['runs'] })
       navigate(`/runs/${run.id}`)
     },
-    onError: (err: unknown) => {
-      setError(getErrorMessage(err, 'Failed to create run'))
+    onError: (err) => {
+      const e: unknown = err
+      setError(getErrorMessage(e, 'Failed to create run'))
     },
   })
 
@@ -72,6 +73,7 @@ export default function NewRun() {
 
   const noSuites = projectId && suites?.length === 0
   const noEnvironments = projectId && environments?.length === 0
+  const canEnsureDefaults = Boolean(noSuites || noEnvironments)
 
   const ensureDefaultsMutation = useMutation<
     { message: string; created: string[] },
@@ -87,8 +89,9 @@ export default function NewRun() {
         queryKey: ['projects', projectId, 'environments'],
       })
     },
-    onError: (err: unknown) => {
-      setError(getErrorMessage(err, 'Failed to create defaults'))
+    onError: (err) => {
+      const e: unknown = err
+      setError(getErrorMessage(e, 'Failed to create defaults'))
     },
   })
 
@@ -127,7 +130,7 @@ export default function NewRun() {
             </select>
           </div>
 
-          {noSuites && (
+          {canEnsureDefaults && (
             <div className="form-hint warning">
               This project has no suites.
               <button
