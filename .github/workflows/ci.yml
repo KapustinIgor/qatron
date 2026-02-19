@@ -16,12 +16,8 @@ jobs:
           python-version: '3.11'
       - name: Install Poetry
         run: pip install "poetry>=1.8,<2"
-      - name: Install control-plane dependencies
-        run: cd services/control-plane && poetry install --no-root
-      - name: Install orchestrator dependencies
-        run: cd services/orchestrator && poetry install --no-root
-      - name: Install worker dependencies
-        run: cd services/worker && poetry install --no-root
+      - name: Install dependencies (control-plane, orchestrator, worker)
+        run: bash scripts/ci-poetry-install.sh
       - name: Run linters
         run: |
           cd services/control-plane && poetry run ruff check .
@@ -48,10 +44,10 @@ jobs:
           python-version: '3.11'
       - name: Install Poetry
         run: pip install "poetry>=1.8,<2"
-      - name: Install control-plane dependencies
-        run: cd services/control-plane && poetry install --no-root
-      - name: Install orchestrator dependencies
-        run: cd services/orchestrator && poetry install --no-root
+      - name: Install dependencies (control-plane, orchestrator)
+        run: |
+          cd services/control-plane && poetry install --no-root
+          cd ../orchestrator && poetry install --no-root
       - name: Run tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/qatron_test
