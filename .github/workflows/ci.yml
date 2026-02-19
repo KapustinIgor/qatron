@@ -17,7 +17,10 @@ jobs:
       - name: Install Poetry
         run: pip install "poetry>=1.8,<2"
       - name: Install dependencies (control-plane, orchestrator, worker)
-        run: bash scripts/ci-poetry-install.sh
+        run: |
+          cd services/control-plane && poetry install --no-root
+          cd ../orchestrator && poetry install --no-root
+          cd ../worker && poetry install --no-root
       - name: Run linters
         run: |
           cd services/control-plane && poetry run ruff check .
