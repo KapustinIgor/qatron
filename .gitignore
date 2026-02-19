@@ -71,6 +71,9 @@ logs/
 # Docker
 .dockerignore
 
+# Docker Compose runtime data (minio, prometheus, postgres, etc.)
+deployment/docker-compose/data/
+
 # Helm
 *.tgz
 
