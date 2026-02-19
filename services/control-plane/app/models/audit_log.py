@@ -1,5 +1,5 @@
 """Audit log model."""
-from sqlalchemy import Column, DateTime, Integer, JSON, String, Text, func
+from sqlalchemy import Column, DateTime, Integer, JSON, String, func
 
 from app.core.database import Base
 

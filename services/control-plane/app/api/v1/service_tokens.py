@@ -1,14 +1,13 @@
 """Service token endpoints for CI/CD integration."""
 from typing import Annotated, List
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.audit import AUDIT_ACTION_SERVICE_TOKEN_CREATED, AUDIT_ACTION_SERVICE_TOKEN_REVOKED, log_audit_event
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_role
-from app.core.security import generate_service_token, hash_service_token, verify_password
+from app.core.dependencies import require_role
+from app.core.security import generate_service_token, hash_service_token
 from app.models.service_token import ServiceToken
 from app.models.user import User
 from app.schemas.service_token import ServiceTokenCreate, ServiceTokenCreateResponse, ServiceTokenResponse

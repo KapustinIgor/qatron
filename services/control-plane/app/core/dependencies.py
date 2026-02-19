@@ -1,13 +1,13 @@
 """FastAPI dependencies."""
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import decode_access_token, hash_service_token, verify_password
+from app.core.security import decode_access_token, verify_password
 from app.models.service_token import ServiceToken
 from app.models.user import User
 
@@ -37,7 +37,7 @@ def get_current_user(
     # Try service token
     # Service tokens are stored hashed, so we need to check all active tokens
     # In production, use a more efficient lookup (e.g., token prefix index)
-    service_tokens = db.query(ServiceToken).filter(ServiceToken.is_active == True).all()
+    service_tokens = db.query(ServiceToken).filter(ServiceToken.is_active.is_(True)).all()
     for st in service_tokens:
         try:
             if verify_password(token, st.token_hash):

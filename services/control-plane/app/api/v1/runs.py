@@ -127,7 +127,7 @@ async def trigger_run(
         async with httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.post(enqueue_url)
             resp.raise_for_status()
-    except httpx.ConnectError as e:
+    except httpx.ConnectError:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=(

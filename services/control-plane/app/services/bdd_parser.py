@@ -30,7 +30,7 @@ class GherkinParser:
         }
 
         current_scenario = None
-        current_step = None
+        _current_step = None
         in_background = False
         in_examples = False
         examples_table = []
@@ -81,7 +81,7 @@ class GherkinParser:
                     "steps": [],
                     "examples": [],
                 }
-                in_background = False
+                in_background = False  # noqa: F841 (state for step parsing)
                 in_examples = False
                 i += 1
                 continue

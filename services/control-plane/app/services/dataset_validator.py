@@ -1,6 +1,5 @@
 """Dataset validation using Great Expectations."""
 from typing import Dict, Optional, Tuple
-import json
 
 # Great Expectations integration
 try:
