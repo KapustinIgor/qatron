@@ -11,13 +11,11 @@ from app.core.config import settings
 from app.core.database import Base, engine
 from app.core.init_db import init_db
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize default data on startup with retries."""
+    """Initialize database tables and default data on startup with retries."""
+    Base.metadata.create_all(bind=engine)
     max_attempts = 5
     for attempt in range(max_attempts):
         try:

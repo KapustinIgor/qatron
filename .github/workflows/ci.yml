@@ -42,6 +42,8 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: qatron_test
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -61,13 +63,21 @@ jobs:
         run: |
           poetry --directory=services/control-plane install --no-root --with dev
           poetry --directory=services/orchestrator install --no-root --with dev
+      - name: Wait for Postgres
+        run: |
+          for i in $(seq 1 30); do
+            if (python3 -c "import socket; s=socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 5432)); s.close()" 2>/dev/null); then
+              echo "Postgres is up"; break
+            fi
+            echo "Waiting for Postgres..."; sleep 2
+          done
       - name: Test control-plane
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost/qatron_test
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/qatron_test
         run: cd services/control-plane && poetry run python -m pytest
       - name: Test orchestrator
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost/qatron_test
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/qatron_test
         run: cd services/orchestrator && poetry run python -m pytest
 
   frontend:
